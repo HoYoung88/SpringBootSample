@@ -1,0 +1,111 @@
+<configuration>
+  <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+  <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+  <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+
+  <property name="CONSOLE_LOG_PATTERN" value="%clr(▶ ${LOG_LEVEL_PATTERN:-%5p}) %d{yyyy-MM-dd HH:mm:ss, Asia/Seoul} %clr(%-40.40logger{39}){cyan} %clr([%-40.40class{39} ▶ %method:%line]){magenta} - %msg%n%ex{5}" />
+  <property name="FILE_LOG_PATTERN" value="%clr(▶ ${LOG_LEVEL_PATTERN:-%5p}) %d{yyyy-MM-dd HH:mm:ss, Asia/Seoul} %clr(%-40.40logger{39}){cyan} %clr([%-40.40class{39} ▶ %method:%line]){magenta} - %msg%n%ex{5}" />
+  <property name="CONSOLE_LOG_PATTERN_REQUEST" value="%m%n"/>
+
+  <springProperty name="FILE_PATH" source="logging.file.path" defalutValue="logs" />
+  <springProperty name="FILE_NAME" source="logging.file.name" defalutValue="myapp" />
+
+  <appender name="CONSOLE_APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <appender name="CONSOLE_LOGGER_REQUEST_APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN_REQUEST}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <appender name="FILE_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${user.home}/${FILE_PATH}/${FILE_NAME}.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${user.home}/${FILE_PATH}/${FILE_NAME}.%d{yy-MM-dd, Asia/Seoul}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <appender name="FILE_ERROR_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${user.home}/${FILE_PATH}/error.log</file>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>ERROR</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${user.home}/${FILE_PATH}/old/error-%d{yy-MM-dd, Asia/Seoul}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <logger name="org.springframework" level="INFO" additivity="false">
+    <springProfile name="dev | qa | prod">
+      <appender-ref ref="FILE_APPENDER" />
+    </springProfile>
+    <springProfile name="local">
+      <appender-ref ref="CONSOLE_APPENDER" />
+    </springProfile>
+  </logger>
+
+  <logger name="org.springframework.security" level="DEBUG" additivity="false">
+    <springProfile name="dev | qa | prod">
+      <appender-ref ref="FILE_APPENDER" />
+    </springProfile>
+    <springProfile name="local">
+      <appender-ref ref="CONSOLE_APPENDER" />
+    </springProfile>
+  </logger>
+
+  <logger name="org.springframework.context.support" level="ERROR" additivity="false">
+    <springProfile name="dev | qa | prod">
+      <appender-ref ref="FILE_APPENDER" />
+    </springProfile>
+    <springProfile name="local">
+      <appender-ref ref="CONSOLE_APPENDER" />
+    </springProfile>
+  </logger>
+
+  <logger name="com.github.hoyoung" level="DEBUG" additivity="false">
+    <springProfile name="dev | qa | prod">
+      <appender-ref ref="FILE_APPENDER" />
+    </springProfile>
+    <springProfile name="local">
+      <appender-ref ref="CONSOLE_APPENDER" />
+    </springProfile>
+  </logger>
+
+  <logger name="request.parameter" level="INFO" additivity="false">
+    <springProfile name="dev | qa | prod">
+      <appender-ref ref="FILE_APPENDER" />
+    </springProfile>
+    <springProfile name="local">
+      <appender-ref ref="CONSOLE_LOGGER_REQUEST_APPENDER" />
+    </springProfile>
+  </logger>
+
+  <root level="ERROR" >
+    <springProfile name="dev | qa | prod">
+      <appender-ref ref="FILE_APPENDER" />
+      <appender-ref ref="FILE_ERROR_APPENDER" />
+    </springProfile>
+    <springProfile name="local">
+      <appender-ref ref="CONSOLE_APPENDER" />
+    </springProfile>
+  </root>
+
+</configuration>

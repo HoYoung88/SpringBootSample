@@ -1,0 +1,85 @@
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    locale: ko_KR
+    time-zone: Asia/Seoul
+  datasource:
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: ${spring.jpa.show-sql}
+        show_sql: ${spring.jpa.show-sql}
+        use_sql_comments: false
+    show-sql: true
+  web:
+    locale: ko_KR
+
+logging:
+  file:
+    name: sample
+    path: logs/demo
+
+---
+
+spring:
+  devtools:
+    add-properties: false
+    livereload:
+      enabled: false
+    remote:
+      restart:
+        enabled: false
+    restart:
+      enabled: false
+  profiles:
+    active: prod
+  datasource:
+    data: classpath*:db/data.sql
+    schema: classpath*:db/schema.sql
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: admin
+
+---
+
+spring:
+  profiles:
+    active: qa
+  datasource:
+    data: classpath*:db/data.sql
+    schema: classpath*:db/schema.sql
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: admin
+
+---
+
+spring:
+  profiles:
+    active: dev
+  datasource:
+    data: classpath*:db/data.sql
+    schema: classpath*:db/schema.sql
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: admin
+
+---
+
+spring:
+  profiles:
+    active: local
+  datasource:
+    data: classpath*:db/data.sql
+    schema: classpath*:db/schema.sql
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: admin

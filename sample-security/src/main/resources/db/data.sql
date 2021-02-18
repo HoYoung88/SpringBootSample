@@ -1,0 +1,1 @@
+insert into user(email, password, role) values('admin', '$2a$10$cczgnQH05sMGL6GcM3vDWOWznvrfpTy/j2fNj5jh5Ul/JfJRxliE6', 'USER');
