@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: sample-rest
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     locale: ko_KR
@@ -21,11 +23,6 @@ spring:
     show-sql: true
   web:
     locale: ko_KR
-
-logging:
-  file:
-    name: sample
-    path: logs/demo
 
 ---
 

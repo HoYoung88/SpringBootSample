@@ -1,6 +1,6 @@
 package com.github.hoyoung.security.authentication;
 
-import com.github.hoyoung.security.response.AuthErrorResponse;
+import com.github.hoyoung.security.model.response.AuthErrorResponseEntity;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +23,6 @@ public class BasicAuthenticationEntryPoint implements AuthenticationEntryPoint {
       AuthenticationException exception) throws IOException, ServletException {
     log.warn("authException message :: {}", exception.getMessage());
     log.warn("authException message :: {}", exception.getClass());
-    AuthErrorResponse.of(request, response, exception);
+    AuthErrorResponseEntity.body(request, response, exception);
   }
 }

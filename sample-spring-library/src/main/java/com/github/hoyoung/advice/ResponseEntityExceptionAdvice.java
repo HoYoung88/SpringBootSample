@@ -1,11 +1,11 @@
 package com.github.hoyoung.advice;
 
 
-import static com.github.hoyoung.web.status.service.BaseServiceStatus.*;
+import static com.github.hoyoung.web.status.service.BaseErrorServiceStatus.*;
 
 import com.github.hoyoung.exception.ServiceException;
 import com.github.hoyoung.model.response.ApiErrorResponse;
-import com.github.hoyoung.web.status.service.BaseServiceStatus;
+import com.github.hoyoung.web.status.service.BaseErrorServiceStatus;
 import java.util.Objects;
 import java.util.Optional;
 import javax.validation.ConstraintViolation;
@@ -237,7 +237,7 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
       break;
     }
 
-    this.response =  ApiErrorResponse.builder(headers, status, BaseServiceStatus.BAD_REQUEST)
+    this.response =  ApiErrorResponse.builder(headers, status, BaseErrorServiceStatus.BAD_REQUEST)
         .message(invalidValue)
         .field(message)
         .build();

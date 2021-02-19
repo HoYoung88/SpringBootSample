@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: sample-security
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     locale: ko_KR
@@ -21,14 +23,28 @@ spring:
     show-sql: true
   web:
     locale: ko_KR
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: ab33a62ac9905d8835cc
+            clientSecret: e755e86c33f9babbdd12da5e3d55f282c7c5d0d8
+          kakao:
+            clientId: d7dde454ff6dfaf1add6b6c907012a0b
 
 
-logging:
-  file:
-    name: sample
-    path: logs/demo
+
 server:
   port: 8081
+
+security:
+  jwt:
+    tokenExpirationTime: 15 # Number of minutes
+    refreshTokenExpTime: 60 # Minutes
+    tokenIssuer: http://hoyoung.github.com
+    tokenSubject: sampleToken
+    tokenSigningKey: xm8EV6Hy5RMFK4EEACIDAwQus
 
 ---
 

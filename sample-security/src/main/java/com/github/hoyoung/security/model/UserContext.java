@@ -22,6 +22,11 @@ public class UserContext implements UserDetails {
   private final boolean accountNonLocked;
   private final List<GrantedAuthority> authorities;
 
+  public UserContext(String username, List<GrantedAuthority> authorities) {
+    this(username, null, true, true,
+        true, true, authorities);
+  }
+
   public UserContext(String username, String password, List<GrantedAuthority> authorities) {
     this(username, password, true, true,
         true, true, authorities);
@@ -154,6 +159,10 @@ public class UserContext implements UserDetails {
     public UserContextBuilder authorities(GrantedAuthority... authorities) {
       return authorities(Arrays.asList(authorities));
     }
+
+//    public UserContextBuilder authorities(List<GrantedAuthority> authorities) {
+//      return authorities(authorities);
+//    }
 
     public UserContextBuilder authorities(Collection<? extends GrantedAuthority> authorities) {
       this.authorities = new ArrayList<>(authorities);

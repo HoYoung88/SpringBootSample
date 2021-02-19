@@ -25,7 +25,8 @@ public class BasicAuthenticationProvider implements AuthenticationProvider {
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-    log.warn("===== {} =====", this.getClass().getName());
+    log.warn("===== {} =====", "BasicAuthenticationProvider");
+    log.warn("{}", authentication.toString());
 
     String username = (String) authentication.getPrincipal();
     String password = (String) authentication.getCredentials();

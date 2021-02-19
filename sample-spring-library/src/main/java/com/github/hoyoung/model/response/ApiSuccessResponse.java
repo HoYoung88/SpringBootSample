@@ -1,7 +1,7 @@
 package com.github.hoyoung.model.response;
 
 
-import com.github.hoyoung.web.status.service.BaseServiceStatus;
+import com.github.hoyoung.web.status.service.BaseErrorServiceStatus;
 import com.github.hoyoung.web.status.service.ServiceStatus;
 import lombok.Getter;
 
@@ -22,7 +22,7 @@ public class ApiSuccessResponse<T> {
   }
 
   public static <T> ApiSuccessResponseBuilder<T> builder() {
-    return new ApiSuccessResponseBuilder<T>(BaseServiceStatus.SUCCESS);
+    return new ApiSuccessResponseBuilder<T>(BaseErrorServiceStatus.SUCCESS);
   }
 
   public static <T> ApiSuccessResponseBuilder<T> builder(ServiceStatus serviceStatus) {

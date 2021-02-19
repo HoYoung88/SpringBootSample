@@ -7,8 +7,7 @@
   <property name="FILE_LOG_PATTERN" value="%clr(▶ ${LOG_LEVEL_PATTERN:-%5p}) %d{yyyy-MM-dd HH:mm:ss, Asia/Seoul} %clr(%-40.40logger{39}){cyan} %clr([%-40.40class{39} ▶ %method:%line]){magenta} - %msg%n%ex{5}" />
   <property name="CONSOLE_LOG_PATTERN_REQUEST" value="%m%n"/>
 
-  <springProperty name="FILE_PATH" source="logging.file.path" defalutValue="logs" />
-  <springProperty name="FILE_NAME" source="logging.file.name" defalutValue="myapp" />
+  <springProperty name="FILE_NAME" source="spring.application.name" defalutValue="myapp" />
 
   <appender name="CONSOLE_APPENDER" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
@@ -25,9 +24,9 @@
   </appender>
 
   <appender name="FILE_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${user.home}/${FILE_PATH}/${FILE_NAME}.log</file>
+    <file>${user.home}/logs/${FILE_NAME}/app.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${user.home}/${FILE_PATH}/${FILE_NAME}.%d{yy-MM-dd, Asia/Seoul}.log</fileNamePattern>
+      <fileNamePattern>${user.home}/logs/${FILE_NAME}/app-%d{yy-MM-dd, Asia/Seoul}.log</fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
     <encoder>
@@ -37,14 +36,14 @@
   </appender>
 
   <appender name="FILE_ERROR_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${user.home}/${FILE_PATH}/error.log</file>
+    <file>${user.home}/logs/${FILE_NAME}/error.log</file>
     <filter class="ch.qos.logback.classic.filter.LevelFilter">
       <level>ERROR</level>
       <onMatch>ACCEPT</onMatch>
       <onMismatch>DENY</onMismatch>
     </filter>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${user.home}/${FILE_PATH}/old/error-%d{yy-MM-dd, Asia/Seoul}.log</fileNamePattern>
+      <fileNamePattern>${user.home}/logs/${FILE_NAME}/old/error-%d{yy-MM-dd, Asia/Seoul}.log</fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
     <encoder>
