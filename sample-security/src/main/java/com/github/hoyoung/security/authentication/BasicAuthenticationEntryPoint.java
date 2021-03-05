@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Created by HoYoung on 2021/02/15.
- *
+ * 인증 실패 처리 클래스 [401]
  */
 @Slf4j
 @Component
@@ -21,8 +21,6 @@ public class BasicAuthenticationEntryPoint implements AuthenticationEntryPoint {
   @Override
   public void commence(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException exception) throws IOException, ServletException {
-    log.warn("authException message :: {}", exception.getMessage());
-    log.warn("authException message :: {}", exception.getClass());
     AuthErrorResponseEntity.body(request, response, exception);
   }
 }

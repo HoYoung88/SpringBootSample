@@ -1,5 +1,8 @@
 package com.github.hoyoung.security.handler;
 
+import com.github.hoyoung.model.response.ApiErrorResponse;
+import com.github.hoyoung.security.exception.BasicAuthenticationServiceException;
+import com.github.hoyoung.security.model.response.AuthErrorResponseEntity;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +22,7 @@ public class BasicAccessDeniedHandler implements AccessDeniedHandler {
   @Override
   public void handle(HttpServletRequest request, HttpServletResponse response,
       AccessDeniedException accessDeniedException) throws IOException, ServletException {
-
-    log.info("Access Denied Error....");
-    log.info("Message :: {}", accessDeniedException.getMessage());
-
+    AuthErrorResponseEntity.body(request, response, new BasicAuthenticationServiceException(
+        ApiErrorResponse.forbidden().build()));
   }
 }

@@ -2,7 +2,7 @@ package com.github.hoyoung.security.authentication.provider.jwt;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.github.hoyoung.security.authentication.token.JwtAuthenticationToken;
-import com.github.hoyoung.security.model.UserContext;
+import com.github.hoyoung.security.model.UserDetailsContext;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +22,6 @@ public class JwtTokenAuthenticationProvider implements AuthenticationProvider {
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-    log.warn("{}", authentication.getCredentials());
-    log.warn("{}", authentication.getAuthorities());
-    log.warn("{}", authentication.getPrincipal());
-
     DecodedJWT jwtToken = (DecodedJWT) authentication.getCredentials();
 
     List<String> scopes = jwtToken.getClaim("scopes").asList(String.class);
@@ -34,7 +30,7 @@ public class JwtTokenAuthenticationProvider implements AuthenticationProvider {
         .map(SimpleGrantedAuthority::new)
         .collect(Collectors.toList());
 
-    UserContext context = UserContext.withUsername(jwtToken.getSubject())
+    UserDetailsContext context = UserDetailsContext.withUsername(jwtToken.getSubject())
         .authorities(authorities).build();
 
     return new JwtAuthenticationToken(context, authorities);

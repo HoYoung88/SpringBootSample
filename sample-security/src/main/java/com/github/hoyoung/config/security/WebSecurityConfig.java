@@ -6,6 +6,7 @@ import com.github.hoyoung.security.authentication.filter.BasicAuthenticationProc
 import com.github.hoyoung.security.authentication.filter.jwt.JwtAuthenticationProcessingFilter;
 import com.github.hoyoung.security.authentication.provider.BasicAuthenticationProvider;
 import com.github.hoyoung.security.authentication.provider.jwt.JwtTokenAuthenticationProvider;
+import com.github.hoyoung.security.entity.Role;
 import com.github.hoyoung.security.generate.jwt.JwtTokenGenerate;
 import com.github.hoyoung.security.handler.BasicAccessDeniedHandler;
 import com.github.hoyoung.security.handler.BasicAuthenticationResultHandler;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -33,11 +35,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(
+    prePostEnabled = true,
+    securedEnabled = true,
+    jsr250Enabled = true)
 @Slf4j
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   public static final String AUTHENTICATION_URL = "/login";
   public static final String REFRESH_TOKEN_URL = "/api/auth/token";
-  public static final String API_ROOT_URL = "/user/**";
+  public static final String API_ROOT_URL = "/users/**";
 
   @Autowired
   private AuthenticationManager authenticationManager;
@@ -99,142 +105,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
           .permitAll()
         .and()
           .authorizeRequests()
-          .antMatchers(API_ROOT_URL).authenticated()
+          .antMatchers("/users/me").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+          .antMatchers(API_ROOT_URL).hasAnyRole(Role.USER.name())
+//          .antMatchers(API_ROOT_URL).authenticated()
         .and()
-        .formLogin()
-          .disable()
-        .oauth2Login()
-          .successHandler(this.basicAuthenticationResultHandler)
-          .failureHandler(this.basicAuthenticationResultHandler)
-          .and()
-        .logout().logoutSuccessHandler(this.basicAuthenticationResultHandler).and()
-        .headers().frameOptions().disable().and()
-        .csrf().disable().exceptionHandling()
-          .authenticationEntryPoint(this.basicAuthenticationEntryPoint)
-          .accessDeniedHandler(this.basicAccessDeniedHandler)
-          .and()
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-        .addFilterBefore(this.basicAuthenticationProcessingFilter(),
-            UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(this.jwtAuthenticationProcessingFilter(permitAllEndpointList, API_ROOT_URL),
-            UsernamePasswordAuthenticationFilter.class)
+          .formLogin()
+            .disable()
+          .oauth2Login()
+            .successHandler(this.basicAuthenticationResultHandler)
+            .failureHandler(this.basicAuthenticationResultHandler)
+        .and()
+          .logout().logoutSuccessHandler(this.basicAuthenticationResultHandler).and()
+          .headers().frameOptions().disable()
+        .and()
+          .csrf().disable().exceptionHandling()
+            .authenticationEntryPoint(this.basicAuthenticationEntryPoint)
+            .accessDeniedHandler(this.basicAccessDeniedHandler)
+        .and()
+          .httpBasic().disable()
+          .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+          .addFilterBefore(this.basicAuthenticationProcessingFilter(),
+              UsernamePasswordAuthenticationFilter.class)
+          .addFilterBefore(this.jwtAuthenticationProcessingFilter(permitAllEndpointList, API_ROOT_URL),
+              UsernamePasswordAuthenticationFilter.class)
     ;
   }
 }
-
-
-
-//  @Override
-//  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-////    PasswordEncoder.encode(1234);
-//    auth.inMemoryAuthentication()
-//        .withUser("user").password(new BCryptPasswordEncoder().encode("1234")).roles("USER")
-//        .and()
-//        .withUser("admin").password(new BCryptPasswordEncoder().encode("1234")).roles("USER", "ADMIN");
-//  }
-
-
-//    http
-//        .csrf().disable()
-////        .exceptionHandling()
-////          .authenticationEntryPoint(this.customAuthenticationEntryPoint)
-////          .accessDeniedHandler(this.asyncAccessDeniedHandler)
-////        .and()
-//          .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//        .and()
-//        .formLogin()
-//        .and()
-//          .authorizeRequests()
-//          .antMatchers(permitAllEndpointList.toArray(new String[permitAllEndpointList.size()]))
-//          .permitAll()
-//        .and()
-//          .authorizeRequests()
-//          .antMatchers(API_ROOT_URL).authenticated() // Protected API End-points
-//        .and()
-//        .logout()
-//        .addFilterBefore(this.asyncAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-
-
-
-
-
-    /*
-
-
-    http
-        .csrf().disable()
-          .exceptionHandling().authenticationEntryPoint(this.customAuthenticationEntryPoint)
-        .and()
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-        .authorizeRequests(a -> a.antMatchers("/login", "/error", "/webjars/**")
-            .permitAll()
-            .anyRequest()
-            .authenticated())
-        .authenticationProvider(this.customAuthenticationProvider)
-//        .formLogin().and()
-        .logout(l -> l.logoutSuccessUrl("/login").permitAll())
-
-
-     */
-//        .httpBasic().disable()
-//        .csrf().disable()
-//        .formLogin().disable()
-//        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//        .and()
-//        .authorizeRequests()
-//        .antMatchers(HttpMethod.GET, "/books/**").hasRole("USER")
-//        .antMatchers(HttpMethod.POST, "/books").hasRole("ADMIN")
-//        .antMatchers(HttpMethod.PUT, "/books/**").hasRole("ADMIN")
-//        .antMatchers(HttpMethod.PATCH, "/books/**").hasRole("ADMIN")
-//        .antMatchers(HttpMethod.DELETE, "/books/**").hasRole("ADMIN")
-//        .and()
-//        .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
-//        .and()
-;
-
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//      http
-//          .httpBasic().disable() // rest api 이므로 기본설정 사용안함. 기본설정은 비인증시 로그인폼 화면으로 리다이렉트 된다.
-//          .csrf().disable() // rest api이므로 csrf 보안이 필요없으므로 disable처리.
-//          .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt token으로 인증할것이므로 세션필요없으므로 생성안함.
-//          .and()
-//          .authorizeRequests() // 다음 리퀘스트에 대한 사용권한 체크
-//          .antMatchers("/*/signin", "/*/signup").permitAll() // 가입 및 인증 주소는 누구나 접근가능
-//          .antMatchers(HttpMethod.GET, "/exception/**", "helloworld/**").permitAll() // hellowworld로 시작하는 GET요청 리소스는 누구나 접근가능
-//          .antMatchers("/*/users").hasRole("ADMIN")
-//          .anyRequest().hasRole("USER") // 그외 나머지 요청은 모두 인증된 회원만 접근 가능
-//          .and()
-//          .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
-//          .and()
-//          .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-//          .and()
-//          .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class); // jwt token 필터를 id/password 인증 필터 전에 넣어라.
-//    }
-
-//  @Bean
-//  public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService(WebClient rest) {
-//    DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-//    return request -> {
-//      OAuth2User user = delegate.loadUser(request);
-//      if (!"github".equals(request.getClientRegistration().getRegistrationId())) {
-//        return user;
-//      }
-//
-//      OAuth2AuthorizedClient client = new OAuth2AuthorizedClient
-//          (request.getClientRegistration(), user.getName(), request.getAccessToken());
-//      String url = user.getAttribute("organizations_url");
-//      List<Map<String, Object>> orgs = rest
-//          .get().uri(url)
-//          .attributes(oauth2AuthorizedClient(client))
-//          .retrieve()
-//          .bodyToMono(List.class)
-//          .block();
-//
-//      if (orgs.stream().anyMatch(org -> "spring-projects".equals(org.get("login")))) {
-//        return user;
-//      }
-//
-//      throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token", "Not in Spring Team", ""));
-//    };
-//  }

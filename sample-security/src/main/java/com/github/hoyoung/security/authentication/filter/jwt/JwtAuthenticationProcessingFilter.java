@@ -65,7 +65,6 @@ public class JwtAuthenticationProcessingFilter extends AbstractAuthenticationPro
     context.setAuthentication(authResult);
     SecurityContextHolder.setContext(context);
     chain.doFilter(request, response);
-//    this.basicAuthenticationResultHandler.onAuthenticationSuccess(request, response, authResult);
   }
 
   @Override

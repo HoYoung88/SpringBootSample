@@ -4,12 +4,13 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.github.hoyoung.config.security.properties.JwtProperties;
-import com.github.hoyoung.security.model.UserContext;
+import com.github.hoyoung.model.response.ApiErrorResponse;
+import com.github.hoyoung.security.exception.BasicAuthenticationServiceException;
+import com.github.hoyoung.security.model.UserDetailsContext;
 import com.github.hoyoung.util.DateUtils;
-import java.time.LocalDateTime;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,16 +29,28 @@ public class JwtTokenGenerate {
     return Algorithm.HMAC256(jwtProperties.getTokenSigningKey());
   }
 
-  public String createAccessToken(UserContext userContext) {
+  public String createAccessToken(UserDetailsContext userDetailsContext) {
     Algorithm algorithmHS = this.getAlogrithm();
     return JWT.create()
         .withIssuer(jwtProperties.getTokenIssuer())
-        .withExpiresAt(DateUtils.asDate(LocalDateTime.now()
+        .withExpiresAt(DateUtils.asDate(userDetailsContext.getLoginTime()
             .plusMinutes(jwtProperties.getTokenExpirationTime())))
-        .withSubject(userContext.getUsername())
-        .withClaim("id", UUID.randomUUID().toString())
-        .withClaim("email", userContext.getUsername())
-        .withArrayClaim("scopes", userContext.getAuthorities().stream()
+        .withSubject(userDetailsContext.getUsername())
+        .withArrayClaim("scopes", userDetailsContext.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority).toArray(String[]::new))
+        .sign(algorithmHS);
+  }
+
+  public String createRefreshToken(UserDetailsContext userDetailsContext) {
+    Algorithm algorithmHS = this.getAlogrithm();
+    return JWT.create()
+        .withIssuer(jwtProperties.getTokenIssuer())
+        .withNotBefore(DateUtils.asDate(userDetailsContext.getLoginTime()
+            .plusMinutes(jwtProperties.getRefreshTokenExpTime())))
+        .withExpiresAt(DateUtils.asDate(userDetailsContext.getLoginTime()
+            .plusMinutes(jwtProperties.getRefreshTokenExpTime())))
+        .withSubject(userDetailsContext.getUsername())
+        .withArrayClaim("scopes", userDetailsContext.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority).toArray(String[]::new))
         .sign(algorithmHS);
   }
@@ -46,6 +59,10 @@ public class JwtTokenGenerate {
     JWTVerifier verifier = JWT.require(this.getAlogrithm()).build();
     try {
       return verifier.verify(jwtToken);
+    } catch (TokenExpiredException token) {
+      throw new BasicAuthenticationServiceException(ApiErrorResponse.unauthorized()
+          .message("만료된 Token입니다.")
+          .build());
     } catch (JWTVerificationException exception){
       exception.printStackTrace();
       throw new AuthenticationServiceException(exception.getMessage());

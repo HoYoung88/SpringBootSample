@@ -1,11 +1,14 @@
 package com.github.hoyoung.security.model;
 
 import com.github.hoyoung.security.entity.Role;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import lombok.Getter;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 /**
  * Created by HoYoung on 2021/02/16.
  */
-public class UserContext implements UserDetails {
+@ToString
+public class UserDetailsContext implements UserDetails {
   private final String username;
   private String password;
   private final boolean enabled;
@@ -21,18 +25,20 @@ public class UserContext implements UserDetails {
   private final boolean credentialsNonExpired;
   private final boolean accountNonLocked;
   private final List<GrantedAuthority> authorities;
+  @Getter
+  private LocalDateTime loginTime;
 
-  public UserContext(String username, List<GrantedAuthority> authorities) {
+  public UserDetailsContext(String username, List<GrantedAuthority> authorities) {
     this(username, null, true, true,
         true, true, authorities);
   }
 
-  public UserContext(String username, String password, List<GrantedAuthority> authorities) {
+  public UserDetailsContext(String username, String password, List<GrantedAuthority> authorities) {
     this(username, password, true, true,
         true, true, authorities);
   }
 
-  public UserContext(String username, String password, boolean enabled, boolean accountNonExpired,
+  public UserDetailsContext(String username, String password, boolean enabled, boolean accountNonExpired,
       boolean credentialsNonExpired, boolean accountNonLocked,
       List<GrantedAuthority> authorities) {
     this.username = username;
@@ -77,6 +83,10 @@ public class UserContext implements UserDetails {
   @Override
   public boolean isEnabled() {
     return this.enabled;
+  }
+
+  public void addLoginSuccessTime() {
+    this.loginTime = LocalDateTime.now();
   }
 
   public static UserContextBuilder withUsername(String username) {
@@ -169,8 +179,8 @@ public class UserContext implements UserDetails {
       return this;
     }
 
-    public UserContext build() {
-      return new UserContext(this.username, this.password, !this.disabled, !this.accountExpired,
+    public UserDetailsContext build() {
+      return new UserDetailsContext(this.username, this.password, !this.disabled, !this.accountExpired,
           !this.credentialsExpired, !this.accountLocked, this.authorities);
     }
 

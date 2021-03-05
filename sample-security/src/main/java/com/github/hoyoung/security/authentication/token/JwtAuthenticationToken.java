@@ -1,7 +1,7 @@
 package com.github.hoyoung.security.authentication.token;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.github.hoyoung.security.model.UserContext;
+import com.github.hoyoung.security.model.UserDetailsContext;
 import java.util.Collection;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,7 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
   private static final long serialVersionUID = 2877954820905567501L;
 
-  private UserContext userContext;
+  private UserDetailsContext userDetailsContext;
   private DecodedJWT token;
 
   public JwtAuthenticationToken(DecodedJWT token) {
@@ -21,10 +21,10 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     this.token = token;
   }
 
-  public JwtAuthenticationToken(UserContext userContext, Collection<? extends GrantedAuthority> authorities) {
+  public JwtAuthenticationToken(UserDetailsContext userDetailsContext, Collection<? extends GrantedAuthority> authorities) {
     super(authorities);
     this.eraseCredentials();
-    this.userContext = userContext;
+    this.userDetailsContext = userDetailsContext;
     super.setAuthenticated(true);
   }
 
@@ -45,7 +45,7 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
   @Override
   public Object getPrincipal() {
-    return this.userContext;
+    return this.userDetailsContext;
   }
 
   @Override
