@@ -65,9 +65,7 @@ public class AuthResponseEntity {
         .build();
 
     try (OutputStream os = response.getOutputStream()) {
-      new ObjectMapper().writeValue(os, ApiSuccessResponse.builder()
-          .data(authResponseEntity)
-          .build());
+      new ObjectMapper().writeValue(os, ApiSuccessResponse.ok(authResponseEntity));
       os.flush();
     }
   }

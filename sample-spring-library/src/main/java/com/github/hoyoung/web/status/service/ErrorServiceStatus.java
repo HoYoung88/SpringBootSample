@@ -6,8 +6,7 @@ import lombok.Getter;
  * Created by HoYoung on 2021/01/27.
  */
 @Getter
-public enum BaseErrorServiceStatus implements ServiceStatus {
-  SUCCESS("200", "요청이 정상적으로 처리되었습니다."),
+public enum ErrorServiceStatus implements BasicServiceStatus {
   BAD_REQUEST("-400", "올바르지 않는 요청입니다."),
   UNAUTHORIZED("-401", "로그인 정보가 올바르지 않습니다."),
   FORBIDDEN("-403", "접근이 거부되었습니다."),
@@ -22,7 +21,7 @@ public enum BaseErrorServiceStatus implements ServiceStatus {
   private final String code;
   private final String message;
 
-  BaseErrorServiceStatus(final String code, final String message) {
+  ErrorServiceStatus(final String code, final String message) {
     this.code = code;
     this.message = message;
   }

@@ -61,7 +61,6 @@ public class RequestContextAspect {
 
     try {
       String requestTime = LocalDateTime.now(KOREA_ZONE_ID).format(DEFAULT_DATA_TIME_FORMATTER);
-
       sb.append(hyphen).append(System.lineSeparator())
           .append(LoggerAppender.message("request time", requestTime))
           .append(System.lineSeparator())

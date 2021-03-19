@@ -13,7 +13,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     open-in-view: false
     properties:
       hibernate:
@@ -39,8 +39,8 @@ spring:
   profiles:
     active: prod
   datasource:
-    data: classpath*:db/data.sql
-    schema: classpath*:db/schema.sql
+#    data: classpath*:db/data.sql
+#    schema: classpath*:db/schema.sql
     url: jdbc:h2:mem:testdb
     username: sa
     password: admin
@@ -51,8 +51,8 @@ spring:
   profiles:
     active: qa
   datasource:
-    data: classpath*:db/data.sql
-    schema: classpath*:db/schema.sql
+#    data: classpath*:db/data.sql
+#    schema: classpath*:db/schema.sql
     url: jdbc:h2:mem:testdb
     username: sa
     password: admin
@@ -63,8 +63,8 @@ spring:
   profiles:
     active: dev
   datasource:
-    data: classpath*:db/data.sql
-    schema: classpath*:db/schema.sql
+#    data: classpath*:db/data.sql
+#    schema: classpath*:db/schema.sql
     url: jdbc:h2:mem:testdb
     username: sa
     password: admin
@@ -75,8 +75,9 @@ spring:
   profiles:
     active: local
   datasource:
-    data: classpath*:db/data.sql
-    schema: classpath*:db/schema.sql
-    url: jdbc:h2:mem:testdb
+#    data: classpath*:db/data.sql
+#    schema: classpath*:db/schema.sql
+#    url: jdbc:h2:tcp://localhost:8082:testdb
+    url: jdbc:h2:tcp://localhost/~/demo
     username: sa
     password: admin

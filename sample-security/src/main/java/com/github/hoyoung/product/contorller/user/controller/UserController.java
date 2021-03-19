@@ -1,4 +1,4 @@
-package com.github.hoyoung.api.user.controller;
+package com.github.hoyoung.product.contorller.user.controller;
 
 import com.github.hoyoung.controller.BasicController;
 import com.github.hoyoung.security.authentication.token.JwtAuthenticationToken;

@@ -1,7 +1,7 @@
 package com.github.hoyoung.security.exception;
 
 import com.github.hoyoung.model.response.ApiErrorResponse;
-import com.github.hoyoung.web.status.service.ServiceStatus;
+import com.github.hoyoung.web.status.service.BasicServiceStatus;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -12,23 +12,23 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 @Getter
 public class BasicAuthenticationServiceException extends AuthenticationServiceException {
   private HttpStatus status = HttpStatus.UNAUTHORIZED;
-  private ServiceStatus serviceStatus;
+  private BasicServiceStatus basicServiceStatus;
   private ApiErrorResponse apiErrorResponse;
 
-  public BasicAuthenticationServiceException(ServiceStatus serviceStatus) {
-    super(serviceStatus.getMessage());
-    this.serviceStatus = serviceStatus;
+  public BasicAuthenticationServiceException(BasicServiceStatus basicServiceStatus) {
+    super(basicServiceStatus.getMessage());
+    this.basicServiceStatus = basicServiceStatus;
   }
 
-  public BasicAuthenticationServiceException(ServiceStatus serviceStatus, HttpStatus status) {
-    super(serviceStatus.getMessage());
-    this.serviceStatus = serviceStatus;
+  public BasicAuthenticationServiceException(BasicServiceStatus basicServiceStatus, HttpStatus status) {
+    super(basicServiceStatus.getMessage());
+    this.basicServiceStatus = basicServiceStatus;
     this.status = status;
   }
 
-  public BasicAuthenticationServiceException(ServiceStatus serviceStatus, String message, HttpStatus status) {
+  public BasicAuthenticationServiceException(BasicServiceStatus basicServiceStatus, String message, HttpStatus status) {
     super(message);
-    this.serviceStatus = serviceStatus;
+    this.basicServiceStatus = basicServiceStatus;
     this.status = status;
   }
 

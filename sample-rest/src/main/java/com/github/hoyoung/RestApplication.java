@@ -6,12 +6,10 @@ package com.github.hoyoung;
 import java.util.Locale;
 import java.util.TimeZone;
 import javax.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@Slf4j
 public class RestApplication {
 
   @PostConstruct

@@ -1,50 +1,60 @@
 package com.github.hoyoung.model.response;
 
 
-import com.github.hoyoung.web.status.service.BaseErrorServiceStatus;
-import com.github.hoyoung.web.status.service.ServiceStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonRootName;
+import com.github.hoyoung.web.status.service.SuccessServiceStatus;
+import com.github.hoyoung.web.status.service.BasicServiceStatus;
+import java.net.URI;
 import lombok.Getter;
 
 /**
  * Created by HoYoung on 2021/01/25.
  */
 @Getter
+@JsonRootName(value = "result")
 public class ApiSuccessResponse<T> {
 
   private final String code;
   private final String message;
+  @JsonInclude(Include.NON_EMPTY)
+  private final URI location;
+
+  @JsonInclude(Include.NON_EMPTY)
   private final T data;
 
-  private ApiSuccessResponse(ServiceStatus serviceStatus, String message, T data) {
-    this.code = serviceStatus.getCode();
+  private ApiSuccessResponse(BasicServiceStatus basicServiceStatus, String message, T data, URI location) {
+    this.code = basicServiceStatus.getCode();
     this.data = data;
     this.message = message;
+    this.location = location;
   }
 
-  public static <T> ApiSuccessResponseBuilder<T> builder() {
-    return new ApiSuccessResponseBuilder<T>(BaseErrorServiceStatus.SUCCESS);
+  public static ApiSuccessResponse<Object> create(URI location) {
+    return new ApiSuccessResponseBuilder<>(SuccessServiceStatus.CREATED)
+        .location(location)
+        .build();
   }
 
-  public static <T> ApiSuccessResponseBuilder<T> builder(ServiceStatus serviceStatus) {
-    return new ApiSuccessResponseBuilder<T>(serviceStatus);
-  }
-
-  public static <T> ApiSuccessResponseBuilder<T> builder(ServiceStatus serviceStatus, String message) {
-    return new ApiSuccessResponseBuilder<T>(serviceStatus, message);
+  public static <T> ApiSuccessResponse<T> ok(T data) {
+    return new ApiSuccessResponseBuilder<T>(SuccessServiceStatus.SUCCESS)
+        .data(data).build();
   }
 
   public static class ApiSuccessResponseBuilder<T> {
-    private final ServiceStatus serviceStatus;
+    private final BasicServiceStatus basicServiceStatus;
     private final String message;
     private T data;
+    private URI location;
 
-    private ApiSuccessResponseBuilder(ServiceStatus serviceStatus) {
-      this.serviceStatus = serviceStatus;
-      this.message = serviceStatus.getMessage();
+    private ApiSuccessResponseBuilder(BasicServiceStatus basicServiceStatus) {
+      this.basicServiceStatus = basicServiceStatus;
+      this.message = basicServiceStatus.getMessage();
     }
 
-    private ApiSuccessResponseBuilder(ServiceStatus serviceStatus, String message) {
-      this.serviceStatus = serviceStatus;
+    private ApiSuccessResponseBuilder(BasicServiceStatus basicServiceStatus, String message) {
+      this.basicServiceStatus = basicServiceStatus;
       this.message = message;
     }
 
@@ -52,9 +62,14 @@ public class ApiSuccessResponse<T> {
       this.data = data;
       return this;
     }
+
+    public ApiSuccessResponseBuilder<T> location(final URI location) {
+      this.location = location;
+      return this;
+    }
+
     public ApiSuccessResponse<T> build() {
-      return new ApiSuccessResponse<T>(this.serviceStatus, this.message, this.data);
+      return new ApiSuccessResponse<T>(this.basicServiceStatus, this.message, this.data, this.location);
     }
   }
-
 }

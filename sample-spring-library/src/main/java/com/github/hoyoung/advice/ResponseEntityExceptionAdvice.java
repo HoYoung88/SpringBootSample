@@ -1,11 +1,11 @@
 package com.github.hoyoung.advice;
 
 
-import static com.github.hoyoung.web.status.service.BaseErrorServiceStatus.*;
+import static com.github.hoyoung.web.status.service.ErrorServiceStatus.*;
 
-import com.github.hoyoung.exception.ServiceException;
+import com.github.hoyoung.exception.ApiServiceException;
 import com.github.hoyoung.model.response.ApiErrorResponse;
-import com.github.hoyoung.web.status.service.BaseErrorServiceStatus;
+import com.github.hoyoung.web.status.service.ErrorServiceStatus;
 import java.util.Objects;
 import java.util.Optional;
 import javax.validation.ConstraintViolation;
@@ -61,7 +61,7 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
         .message(METHOD_NOT_ALLOWED.format(methodNotAllowed))
         .build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @Override
@@ -78,7 +78,7 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
         .message(UNSUPPORTED_MEDIA_TYPE.format(unsupportedMediaType))
         .build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @Override
@@ -90,7 +90,7 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
     this.response = ApiErrorResponse.builder(headers, status, UNSUPPORTED_MEDIA_TYPE)
         .build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @Override
@@ -118,7 +118,7 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
         .field(ex.getParameterName())
         .build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @Override
@@ -131,7 +131,7 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
         .message(ex.getMessage())
         .build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @Override
@@ -142,7 +142,7 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
     this.response = ApiErrorResponse.builder(headers, status, INTERNAL_SERVER_ERROR)
         .message(ex.getMessage()).build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @Override
@@ -152,7 +152,7 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
 
     this.response = ApiErrorResponse.builder(headers, status, BAD_REQUEST).build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @Override
@@ -160,9 +160,11 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
       HttpHeaders headers, HttpStatus status, WebRequest request) {
     super.handleHttpMessageNotReadable(ex, headers, status, request);
 
-    this.response = ApiErrorResponse.builder(headers, status, HTTP_MESSAGE_NOT_READABLE).build();
+    this.response = ApiErrorResponse.builder(headers, status, HTTP_MESSAGE_NOT_READABLE)
+        .message(ex.getMessage())
+        .build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @Override
@@ -170,9 +172,11 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
       HttpHeaders headers, HttpStatus status, WebRequest request) {
     super.handleHttpMessageNotWritable(ex, headers, status, request);
 
-    this.response = ApiErrorResponse.builder(headers, status, HTTP_MESSAGE_NOT_WRITABLE).build();
+    this.response = ApiErrorResponse.builder(headers, status, HTTP_MESSAGE_NOT_WRITABLE)
+        .message(ex.getMessage())
+        .build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @Override
@@ -193,7 +197,7 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
         .message("필수 입력 파라미터입니다.")
         .field(ex.getRequestPartName())
         .build();
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @Override
@@ -209,7 +213,7 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
             .field(fieldError.getField())
             .build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @Override
@@ -220,7 +224,7 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
     this.response = ApiErrorResponse.builder(headers, status, NOT_FOUND)
             .path(ex.getRequestURL())
             .build();
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @ExceptionHandler(value = ConstraintViolationException.class)
@@ -232,29 +236,29 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
     String invalidValue = "";
     String message = "";
     for (ConstraintViolation<?> constraintViolation : ex.getConstraintViolations()) {
-      invalidValue = constraintViolation.getPropertyPath().toString();
+      invalidValue = getPopertyName(constraintViolation.getPropertyPath().toString());
       message = constraintViolation.getMessage();
       break;
     }
 
-    this.response =  ApiErrorResponse.builder(headers, status, BaseErrorServiceStatus.BAD_REQUEST)
-        .message(invalidValue)
-        .field(message)
+    this.response =  ApiErrorResponse.builder(headers, status, ErrorServiceStatus.BAD_REQUEST)
+        .message(message)
+        .field(invalidValue)
         .build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
-  @ExceptionHandler(value = ServiceException.class)
-  protected ResponseEntity<Object> handleServiceException(ServiceException ex, WebRequest request) {
+  @ExceptionHandler(value = ApiServiceException.class)
+  protected ResponseEntity<Object> handleServiceException(ApiServiceException ex, WebRequest request) {
     HttpHeaders headers = ex.getHeaders();
     HttpStatus status = ex.getStatus();
 
-    this.response = ApiErrorResponse.builder(headers, status, ex.getServiceStatus())
+    this.response = ApiErrorResponse.builder(headers, status, ex.getBasicServiceStatus())
         .message(ex.getMessage())
         .build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
   @ExceptionHandler(value = RuntimeException.class)
@@ -267,7 +271,17 @@ public class ResponseEntityExceptionAdvice extends ResponseEntityExceptionHandle
         .message(ex.getMessage())
         .build();
 
-    return super.handleExceptionInternal(ex, this.response, headers, status, request);
+    return this.handleExceptionInternal(ex, this.response, headers, status, request);
   }
 
+  @Override
+  protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body,
+      HttpHeaders headers, HttpStatus status, WebRequest request) {
+    ex.printStackTrace();
+    return super.handleExceptionInternal(ex, body, headers, status, request);
+  }
+
+  private String getPopertyName(String propertyPath) {
+    return propertyPath.substring(propertyPath.lastIndexOf('.') + 1);
+  }
 }

@@ -57,7 +57,7 @@ dependencies {
 }
 
 tasks.named('test') {
-    exclude '**/*'
+//    exclude '**/*'
     // Use junit platform for unit tests.
     useJUnitPlatform()
 }
