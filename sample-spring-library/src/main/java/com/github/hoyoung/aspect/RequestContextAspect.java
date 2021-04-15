@@ -107,7 +107,6 @@ public class RequestContextAspect {
 
           sb.append(LoggerAppender.message("parameter", mSb.toString()))
               .append(System.lineSeparator());
-
         });
       }
 
@@ -132,6 +131,8 @@ public class RequestContextAspect {
       result = proceedingJoinPoint.proceed();
 
     } catch (Throwable throwable) {
+//      throwable.printStackTrace();
+//      log.error("{}", throwable.fillInStackTrace());
       throw throwable;
     } finally {
       // Controller 로직 실행 시간
