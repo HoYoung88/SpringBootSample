@@ -28,6 +28,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Created by HoYoung on 2021/02/09.
@@ -40,7 +41,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
     securedEnabled = true,
     jsr250Enabled = true)
 @Slf4j
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
   public static final String AUTHENTICATION_URL = "/login";
   public static final String REFRESH_TOKEN_URL = "/api/auth/token";
   public static final String API_ROOT_URL = "/users/**";
@@ -81,19 +82,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
   @Bean
-  @Override
-  public AuthenticationManager authenticationManagerBean() throws Exception {
-    return super.authenticationManagerBean();
+  public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+      AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+  
+      builder.authenticationProvider(basicAuthenticationProvider);
+      builder.authenticationProvider(jwtTokenAuthenticationProvider);
+  
+      return builder.build();
   }
 
-  @Override
-  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.authenticationProvider(this.basicAuthenticationProvider);
-    auth.authenticationProvider(this.jwtTokenAuthenticationProvider);
-  }
-
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     List<String> permitAllEndpointList = Arrays.asList(
         AUTHENTICATION_URL,
         REFRESH_TOKEN_URL,
@@ -124,6 +122,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
           .httpBasic().disable()
           .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+          .authenticationManager(authenticationManager(http))
           .addFilterBefore(this.basicAuthenticationProcessingFilter(),
               UsernamePasswordAuthenticationFilter.class)
           .addFilterBefore(this.jwtAuthenticationProcessingFilter(permitAllEndpointList, API_ROOT_URL),
